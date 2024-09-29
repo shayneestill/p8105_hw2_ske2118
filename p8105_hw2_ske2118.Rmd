@@ -3,4 +3,27 @@ title: "HW2"
 output: github_document
 ---
 
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+## 'Problem 1' 
+
+Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or case_match function may be useful).
+
+Import dataset and clean up column names 
+```{r}
+subway_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
+
+subway_df = janitor::clean_names(subway_df)
+```
+
+
+Retain specified columns and convert entry variable from char to log
+
+```{r}
+subway_df = 
+  select(subway_df, line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada) |>
+  mutate(subway_df = ifelse(subway_df == "NO", 0, 1))
+```
 
