@@ -24,6 +24,6 @@ Retain specified columns and convert entry variable from char to log
 ```{r}
 subway_df = 
   select(subway_df, line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada) |>
-  mutate(subway_df = ifelse(subway_df == "NO", 0, 1))
+  mutate(entry = ifelse(entry == "NO", 0, 1))
 ```
 
