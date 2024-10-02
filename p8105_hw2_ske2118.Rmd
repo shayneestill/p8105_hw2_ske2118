@@ -6,6 +6,7 @@ output: github_document
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
 library(dplyr)
+library(readxl)
 ```
 
 ## 'Problem 1' 
@@ -59,5 +60,23 @@ What proportion of station entrances / exits without vending allow entrance?
 
 ```
 
+### Problem 2 
+
+Read and clean the Mr. Trash Wheel sheet:
+
+specify the sheet in the Excel file and to omit non-data entries (rows with notes / figures; columns containing notes) using arguments in read_excel
+use reasonable variable names
+omit rows that do not include dumpster-specific data
+round the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+
+```{r}
+mr_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", 
+                            sheet = "Mr. Trash Wheel", range = "A2:N653") |>
+  janitor::clean_names() |>
+   drop_na(dumpster) |>
+  mutate(
+    sports_balls = as.integer(round(sports_balls))
+    )
+```
 
 
