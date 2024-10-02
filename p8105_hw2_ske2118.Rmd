@@ -27,14 +27,14 @@ subway_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") |>
 ```
 
 Apply pivot_longer to tidy up route columns.  
+
 ```{r}
 subway_df <- subway_df |> 
   pivot_longer(
     cols = route1:route11,
     names_to = "route", 
     names_prefix = "route",
-    values_to = "subway_line") |>
-  drop_na(subway_line)
+    values_to = "subway_line")
 ```
 
 This dataset contains variables about the NYC subway lines. Columns include line, station name, coordinates, route,subway_route, entry, vending, entrance_type, and ADA accessibility. It has 4270 rows and 10 columns. To clean the data, I first used the janitor step to clean the column names to use snake case formatting. Then I selected our columns of interest and changed the entry variable from character to logical. Then I converted all the routes to character variables so I could apply pivot-longer to get route1-route11 in rows rather than columns. 
@@ -83,7 +83,7 @@ Use a similar process to import, clean, and organize the data for Professor Tras
 
 ```{r}
 prof_trash_wheel = read_excel("data/202409 Trash Wheel Collection Data.xlsx", 
-                            sheet = "Professor Trash Wheel", range = "A2:M123") |>
+                            sheet = "Professor Trash Wheel", range = "A2:M121") |>
   janitor::clean_names() |>
    drop_na(dumpster) 
 
@@ -111,9 +111,46 @@ gwynnda_trash_wheel  <- gwynnda_trash_wheel |>
 
 trash_wheel_tidy <-
   bind_rows(mr_trash_wheel, prof_trash_wheel, gwynnda_trash_wheel)
-    
-  
 ```
 
+
+Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of cigarette butts collected by Gwynnda in June of 2022?
+
+
+These data ...
+
+The total weight of trash collected by Professor Trash Wheel is 
+
+`r sum(pull(filter(trash_wheel_tidy, wheel == "prof_trash_wheel"), weight_tons),na.rm = TRUE)` tons total weight of trash. 
+
+The total number of cigarette butts collected by Gwynnda in June of 2022 is 
+`r sum(pull(filter(trash_wheel_tidy, wheel == "gwynnda_wheel"), cigarette_butts), na.rm = TRUE) ` cigarette butts.
+
+
+
+### Problem 3
+
+In the first part of this problem, your goal is to create a single, well-organized dataset with all the information contained in these data files. To that end: import, clean, tidy, and otherwise wrangle each of these datasets; check for completeness and correctness across datasets (e.g. by viewing individual datasets and using anti_join); merge to create a single, final dataset; and organize this so that variables and observations are in meaningful orders. Export the result as a CSV in the directory containing the original datasets.
+
+```{r}
+bakers_df = read_csv("data/bakers.csv",
+                     na = c("NA", ".", "")) |>
+  janitor::clean_names() 
+  
+bakes_df = read_csv("data/bakes.csv",
+                    na = c("NA", ".", "")) |>
+  janitor::clean_names() 
+  
+results_df = read_csv("data/results.csv",
+                      na = c("NA", ".", "")) |>
+  janitor::clean_names() 
+  
+viewers_df = read_csv("data/viewers.csv",
+                      na = c("NA", ".", "")) |>
+  janitor::clean_names() 
+```
+
+Using janitor::clean_names() to clean all the column names. We notice that in each of the four datasets
+there is series so we can join by that variable 
 
 
