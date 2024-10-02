@@ -5,28 +5,59 @@ output: github_document
 
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
+library(dplyr)
 ```
 
 ## 'Problem 1' 
 
 Read and clean the data; retain line, station, name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or case_match function may be useful).
 
-Import dataset and clean up column names 
+Import dataset and clean up column names. Retain specified columns and convert entry variable from char to log. Convert route 8-11 to character variables to match route 1-7.
 ```{r}
-subway_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
+subway_df = read_csv("data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") |>
+  janitor::clean_names() |>
+  select(line, station_name, station_latitude, station_longitude, route1, route2,route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada) |>
+   mutate(
+      route8 = as.character(route8),
+      route9 = as.character(route9),
+      route10 = as.character(route10),
+      route11 = as.character(route11)) |>
+  mutate(entry = ifelse(entry == "NO", FALSE, TRUE)) 
+```
 
-subway_df = janitor::clean_names(subway_df)
+Apply pivot_longer to tidy up route columns.  
+```{r}
+subway_df <- subway_df |> 
+  pivot_longer(
+    cols = route1:route11,
+    names_to = "route", 
+    names_prefix = "route",
+    values_to = "subway_line") |>
+  drop_na(subway_line)
+```
+
+This dataset contains variables about the NYC subway lines. Columns include line, station name, coordinates, route,subway_route, entry, vending, entrance_type, and ADA accessibility. It has 4270 rows and 10 columns. To clean the data, I first used the janitor step to clean the column names to use snake case formatting. Then I selected our columns of interest and changed the entry variable from character to logical. Then I converted all the routes to character variables so I could apply pivot-longer to get route1-route11 in rows rather than columns. 
+
+
+How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St 8th Avenue; 125st Broadway; 125st Lenox); the distinct function may be useful here.
+
+```{r}
+subway_df$full_station_name <-
+  paste(subway_df$line, subway_df$station_name)
+```
+There are `r nrow(distinct(subway_df, full_station_name))` distinct station names. 
+
+How many stations are ADA compliant?
+```{r}
+sum(subway_df$ada, na.rm=TRUE)
+```
+There are `r nrow(sum(subway_df$ada, na.rm=TRUE))` stations
+
+
+What proportion of station entrances / exits without vending allow entrance?
+```{r}
+
 ```
 
 
-Retain specified columns and convert entry variable from char to log
-
-```{r}
-subway_df = 
-  select(subway_df, line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, route8, route9, route10, route11, entry, vending, entrance_type, ada) |>
-  mutate(entry = ifelse(entry == "NO", 0, 1))
-```
-
-This dataset contains variables about the NYC subway lines. Columns include line, station name, coordinates, routes, entry, vending, entrance_type, and ADA accessibility. It has 1868 rows and 
-19 columns. To clean the data, I first used the janitor step to clean the column names to use snake case formatting. Then I selecting our columns of interst and changed the entry variable from character to logical. These data are not fully tidy because the routes contain both doubles and character variables. 
 
