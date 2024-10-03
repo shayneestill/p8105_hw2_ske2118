@@ -245,6 +245,29 @@ full_merge =
 write_csv(full_merge, "data/full_merge.csv")
 ```
 
+Describe your data cleaning process, including any questions you have or choices you made. Briefly discuss the final dataset.
+
+This process was difficult. I still have a hard time understanding pivot moves and why they are useful. 
+
+
+Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10. Comment on this table – were there any predictable overall winners? Any surprises?
+```{r}
+star_baker_or_winner <- full_merge |>
+  filter(
+          result %in% c("STAR BAKER", "WINNER"),
+          series %in% c(5:10) 
+         ) |>
+  select(series, episode, baker, result) %>%
+    arrange(series, episode)
+```
+
+
+```
+
+
+
+Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. What was the average viewership in Season 1? In Season 5?
+
 
 
 
