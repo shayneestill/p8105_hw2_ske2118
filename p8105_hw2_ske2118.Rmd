@@ -195,10 +195,56 @@ There are `r nrow(missing_bakers_df)` - 1(row for column names) = 25 missing bak
 have the same information in bakes_df
 
 ```{r}
-missing_bakes_df <- bakers_df |>
-  anti_join(bakers_df, by = c("baker", "series"))
+  anti_join(bakers_df, bakes_df)
 ```
-There are `r nrow(missing_bakes_df)` missing bakers that do not
+There are 25 missing bakers that do not
 have the same information in bakes_df
+
+```{r}
+anti_join(bakers_df, results_df)
+```
+Jo Wheatley is missing, it appears that in this is a nickname and her full name is Joanne. 
+Let's fix this. 
+
+```{r}
+results_df <- results_df |> 
+  mutate(baker = case_match(
+         baker, "Joanne" ~ "Jo")
+  )
+```
+
+
+### Merge to create a single, final dataset; and organize this so that variables and observations are in meaningful orders.
+
+Left join to merge datasets
+```{r}
+bakers_bakes_merge = 
+  left_join(bakers_df, bakes_df, by = c("series", "baker")) 
+```
+
+Another merge
+```{r}
+results_bakersbakes_merge = 
+  left_join(bakers_bakes_merge, results_df, by = c("series", "baker"))
+```
+
+Final merge
+
+First rename columns in viewers_df
+```{r}
+viewers_df <- viewers_df |>
+  rename(viewers = series,
+          series = series_number) |>
+  mutate(series = as.double(series))
+```
+
+```{r}
+full_merge = 
+  left_join(results_bakersbakes_merge, viewers_df, by = c("series")) 
+
+write_csv(full_merge, "data/full_merge.csv")
+```
+
+
 
 
