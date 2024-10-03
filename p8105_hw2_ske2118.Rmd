@@ -264,3 +264,22 @@ viewers_table <- viewers_df |>
 head(viewers_table, n = 10)
 ```
 
+
+```{r viewers, include = FALSE}
+viewership_season1 = viewers_table |>
+  filter(series == 1) 
+
+summary(viewership_season1) 
+
+viewership_season5 = viewers_table |>
+  filter(series == 5) 
+
+summary(viewership_season5) 
+```
+
+What was the average viewership in Season 1 is 2.77. 
+
+The average viewership in Season 5 was 10.039.
+
+
+
