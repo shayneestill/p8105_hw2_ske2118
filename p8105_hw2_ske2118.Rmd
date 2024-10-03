@@ -50,15 +50,17 @@ There are `r nrow(distinct(subway_df, full_station_name))` distinct station name
 
 How many stations are ADA compliant?
 ```{r}
-sum(subway_df$ada, na.rm=TRUE)
+sum(stations=TRUE, na.rm=TRUE)
 ```
-There are `r nrow(sum(subway_df$ada, na.rm=TRUE))` stations
+There are `r nrow(sum(stations = TRUE))` stations that are ADA compliant. 
 
 
 What proportion of station entrances / exits without vending allow entrance?
 ```{r}
-
+sum(entrances=TRUE, na.rm=TRUE)
 ```
+There are `r nrow(sum(entrance = TRUE))` stations entrances/exits without vending that allow entrance.
+
 
 ### Problem 2 
 
@@ -117,8 +119,7 @@ trash_wheel_tidy <-
 Write a paragraph about these data; you are encouraged to use inline R. Be sure to note the number of observations in the resulting dataset, and give examples of key variables. For available data, what was the total weight of trash collected by Professor Trash Wheel? What was the total number of cigarette butts collected by Gwynnda in June of 2022?
 
 
-These data ...
-The number of observations in this dataset are 1033 and key variables are wheel, dumpster, month, year, date, and volume_cubic_yards.
+The number of observations in this dataset are 1033 and key variables are wheel, dumpster, month, year, date, and volume_cubic_yards. It tells us interesting data on the various types of trash wheels and the amount and type of trash they clean. 
 
 
 The total weight of trash collected by Professor Trash Wheel is 
@@ -162,8 +163,6 @@ viewers_df = read_csv("data/viewers.csv") |>
 Baker_name in bakers_f is first and last name whereas all other df has column baker with just first name. Separate this column into first and last name. 
 
 Results_df first two rows are not useful, skip them so the third row becomes our columns. 
-
-Bakes_df = 
 
 We notice that in each of the four datasets there is series so we can join by that variable and want to make sure it is organized and the same across all four datasets. 
 
@@ -222,25 +221,10 @@ bakers_bakes_merge =
   left_join(bakers_df, bakes_df, by = c("series", "baker")) 
 ```
 
-Another merge
-```{r}
-results_bakersbakes_merge = 
-  left_join(bakers_bakes_merge, results_df, by = c("series", "baker"))
-```
-
-Final merge
-
-First rename columns in viewers_df
-```{r}
-viewers_df <- viewers_df |>
-  rename(viewers = series,
-          series = series_number) |>
-  mutate(series = as.double(series))
-```
-
+Another merge, final merge
 ```{r}
 full_merge = 
-  left_join(results_bakersbakes_merge, viewers_df, by = c("series")) 
+  left_join(bakers_bakes_merge, results_df, by = c("series", "baker"))
 
 write_csv(full_merge, "data/full_merge.csv")
 ```
@@ -257,17 +241,26 @@ star_baker_or_winner <- full_merge |>
           result %in% c("STAR BAKER", "WINNER"),
           series %in% c(5:10) 
          ) |>
-  select(series, episode, baker, result) %>%
-    arrange(series, episode)
+  select(series, baker, result) %>%
+    arrange(series)
 ```
 
-
-```
-
-
+Difficulty with star baker and winner question. Move on to final question. 
 
 Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. What was the average viewership in Season 1? In Season 5?
 
+Imported previously above.
+First rename columns in viewers_df
+```{r}
+viewers_table <- viewers_df |>
+  rename(viewers = series,
+          series = series_number) |>
+  mutate(series = as.double(series))
+
+```
 
 
+```{r}
+head(viewers_table, n = 10)
+```
 
