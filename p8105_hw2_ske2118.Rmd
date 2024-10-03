@@ -118,39 +118,87 @@ Write a paragraph about these data; you are encouraged to use inline R. Be sure 
 
 
 These data ...
+The number of observations in this dataset are 1033 and key variables are wheel, dumpster, month, year, date, and volume_cubic_yards.
+
 
 The total weight of trash collected by Professor Trash Wheel is 
 
 `r sum(pull(filter(trash_wheel_tidy, wheel == "prof_trash_wheel"), weight_tons),na.rm = TRUE)` tons total weight of trash. 
 
-The total number of cigarette butts collected by Gwynnda in June of 2022 is 
-`r sum(pull(filter(trash_wheel_tidy, wheel == "gwynnda_wheel"), cigarette_butts), na.rm = TRUE) ` cigarette butts.
 
+
+The total number of cigarette butts collected by Gwynnda in June of 2022 
+
+```{r}
+trash_wheel_tidy_butts <- trash_wheel_tidy |>
+  mutate(year = as.numeric(year)) |>
+  filter( month == "June", year == 2022)
+```
+
+The total number of cigarette butts collected by Gwynnda in June of 2022 `r sum(pull(filter(trash_wheel_tidy_butts, wheel == "gwynnda_wheel"), cigarette_butts), na.rm = TRUE) ` cigarette butts.
 
 
 ### Problem 3
 
 In the first part of this problem, your goal is to create a single, well-organized dataset with all the information contained in these data files. To that end: import, clean, tidy, and otherwise wrangle each of these datasets; check for completeness and correctness across datasets (e.g. by viewing individual datasets and using anti_join); merge to create a single, final dataset; and organize this so that variables and observations are in meaningful orders. Export the result as a CSV in the directory containing the original datasets.
 
+Using janitor::clean_names() to clean all the column names.   
+
 ```{r}
-bakers_df = read_csv("data/bakers.csv",
-                     na = c("NA", ".", "")) |>
+bakers_df = read_csv("data/bakers.csv") |>
   janitor::clean_names() 
   
 bakes_df = read_csv("data/bakes.csv",
-                    na = c("NA", ".", "")) |>
+  na = c("NA", ".", "", "UNKNOWN","Unknown", "N/A")) |>
   janitor::clean_names() 
   
-results_df = read_csv("data/results.csv",
-                      na = c("NA", ".", "")) |>
+results_df = read_csv("data/results.csv", skip = 2) |>
   janitor::clean_names() 
   
-viewers_df = read_csv("data/viewers.csv",
-                      na = c("NA", ".", "")) |>
+viewers_df = read_csv("data/viewers.csv") |>
   janitor::clean_names() 
 ```
 
-Using janitor::clean_names() to clean all the column names. We notice that in each of the four datasets
-there is series so we can join by that variable 
+Baker_name in bakers_f is first and last name whereas all other df has column baker with just first name. Separate this column into first and last name. 
+
+Results_df first two rows are not useful, skip them so the third row becomes our columns. 
+
+Bakes_df = 
+
+We notice that in each of the four datasets there is series so we can join by that variable and want to make sure it is organized and the same across all four datasets. 
+
+clean bakers_df
+```{r}
+bakers_df <- bakers_df |>
+  separate(baker_name, into = c("baker", "baker_last_name"), sep = " ")
+
+```
+
+clean viewers_df
+```{r}
+viewers_df <- viewers_df |>
+  pivot_longer(
+    cols = series_1:series_10,
+    names_to = "series_number",
+    names_prefix = "series_",
+    values_to = "series"
+    )
+```
+
+## Check for completeness and correctness 
+```{r}
+missing_bakers_df <- bakers_df |>
+  anti_join(bakes_df, by = c("baker", "series"))
+
+```
+There are `r nrow(missing_bakers_df)` - 1(row for column names) = 25 missing bakers that do not
+have the same information in bakes_df
+
+```{r}
+missing_bakes_df <- bakers_df |>
+  anti_join(bakers_df, by = c("baker", "series"))
+```
+There are `r nrow(missing_bakes_df)` missing bakers that do not
+have the same information in bakes_df
 
 
